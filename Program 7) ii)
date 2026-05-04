@@ -1,0 +1,49 @@
+# Title: AdaBoost Classifier on Iris Dataset
+
+# Step 1: Load dataset
+from sklearn import datasets
+iris = datasets.load_iris()
+
+# Step 2: Split into train and test
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(iris.data[:, :2], iris.target, random_state=42)
+
+# Step 3: AdaBoost Classifier
+from sklearn.ensemble import AdaBoostClassifier
+classifier_adb = AdaBoostClassifier(
+    n_estimators=100,
+    random_state=100,
+    learning_rate=0.1
+)
+classifier_adb.fit(X_train, y_train)
+
+print("\nAdaBoost Classifier Accuracy:", classifier_adb.score(X_test, y_test))
+
+# Step 4: Visualization helpers
+import numpy as np
+import matplotlib.pyplot as plt
+
+def make_meshgrid(x, y, h=.02):
+    x_min, x_max = x.min() - 1, x.max() + 1
+    y_min, y_max = y.min() - 1, y.max() + 1
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
+                         np.arange(y_min, y_max, h))
+    return xx, yy
+
+def plot_contours(ax, clf, xx, yy, **params):
+    Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
+    Z = Z.reshape(xx.shape)
+    out = ax.contourf(xx, yy, Z, **params)
+    return out
+
+# Step 5: Plot decision boundaries
+X0, X1 = iris.data[:, 0], iris.data[:, 1]
+xx, yy = make_meshgrid(X0, X1)
+
+plt.figure(figsize=(7,7))
+plot_contours(plt, classifier_adb, xx, yy, cmap=plt.cm.coolwarm, alpha=0.8)
+plt.scatter(X0, X1, c=iris.target, cmap=plt.cm.coolwarm, s=20, edgecolors='k', alpha=0.6)
+plt.title("Decision Boundary: AdaBoost Classifier on Iris Dataset")
+plt.xlabel("Sepal length")
+plt.ylabel("Sepal width")
+plt.show()
