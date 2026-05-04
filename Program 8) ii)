@@ -1,0 +1,17 @@
+# Title: Agglomerative Clustering on Animals Dataset
+
+from sklearn.cluster import AgglomerativeClustering
+import pandas as pd
+
+# Step 1: Load dataset
+data = pd.read_csv("D:\\KIOT\\PRAVEEN\\AIML_LAB\\animals.csv")
+
+# Step 2: Initialize Agglomerative Clustering
+hierarchical = AgglomerativeClustering(n_clusters=2)
+
+# Step 3: Fit model
+hierarchical.fit(data)
+
+# Step 4: Get cluster labels
+labels = hierarchical.labels_
+print("Agglomerative Cluster Labels:", labels)
