@@ -1,0 +1,47 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+
+# --- Smart Data Loading ---
+try:
+    # Tries the exact lab manual method first (for older lab computers)
+    from sklearn.datasets import load_boston
+    boston = load_boston()
+    features = boston.feature_names
+except ImportError:
+    # Automatically falls back to the modern method if load_boston is blocked (for modern VS Code)
+    from sklearn.datasets import fetch_openml
+    boston = fetch_openml(data_id=531, parser='auto')
+    features = boston.feature_names.tolist()
+
+X = boston.data
+y = boston.target
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Create a Random Forest Regressor with 100 trees
+rfr = RandomForestRegressor(n_estimators=100, random_state=42)
+
+# Fit the model to the training data
+rfr.fit(X_train, y_train)
+
+# Predict the target values of the testing data
+y_pred = rfr.predict(X_test)
+
+# Calculate the mean squared error
+mse = mean_squared_error(y_test, y_pred)
+print("Mean Squared Error:", mse)
+
+# Plot the feature importances
+importances = rfr.feature_importances_
+indices = np.argsort(importances)
+
+plt.title('Feature Importances')
+plt.barh(range(len(indices)), importances[indices], color='b', align='center')
+plt.yticks(range(len(indices)), [features[i] for i in indices])
+plt.xlabel('Relative Importance')
+plt.show()
