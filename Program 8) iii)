@@ -1,0 +1,17 @@
+# Title: DBSCAN Clustering on Customer Purchases
+
+from sklearn.cluster import DBSCAN
+import pandas as pd
+
+# Step 1: Load dataset
+data = pd.read_csv("D:\\KIOT\\AAAA\\AIML_LAB\\customer_purchases.csv")
+
+# Step 2: Initialize DBSCAN
+dbscan = DBSCAN(eps=15, min_samples=2)
+
+# Step 3: Fit model
+dbscan.fit(data)
+
+# Step 4: Get cluster labels
+labels = dbscan.labels_
+print("DBSCAN Cluster Labels:", labels)
