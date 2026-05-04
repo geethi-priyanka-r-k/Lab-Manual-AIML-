@@ -1,0 +1,52 @@
+# Multiple Linear Regression - 50 Startups
+
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+
+
+def main():
+    # Load dataset (keep 50_Startups.csv in same folder)
+    try:
+        dataset = pd.read_csv("50_Startups.csv")
+    except FileNotFoundError:
+        print("Error: 50_Startups.csv not found. Place it in the same folder.")
+        return
+
+    print("Sample Dataset:\n")
+    print(dataset.head())
+
+    # Independent variables (all except last column)
+    X = dataset.iloc[:, :-1].values
+
+    # Dependent variable (Profit)
+    y = dataset.iloc[:, -1].values
+
+    # Encode categorical column (State)
+    ct = ColumnTransformer(
+        transformers=[("encoder", OneHotEncoder(), [3])],
+        remainder="passthrough"
+    )
+    X = ct.fit_transform(X)
+
+    # Split dataset
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=0
+    )
+
+    # Train model
+    regressor = LinearRegression()
+    regressor.fit(X_train, y_train)
+
+    # Predict
+    y_pred = regressor.predict(X_test)
+
+    print("\nActual Values:\n", y_test)
+    print("\nPredicted Values:\n", y_pred)
+
+
+if __name__ == "__main__":
+    main()
