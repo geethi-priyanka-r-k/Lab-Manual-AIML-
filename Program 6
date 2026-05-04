@@ -1,0 +1,87 @@
+# Support Vector Machine - Apples vs Oranges
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.svm import SVC
+from sklearn.metrics import confusion_matrix
+
+
+def main():
+    # Load dataset (keep CSV in same folder)
+    try:
+        data = pd.read_csv("apples_and_oranges.csv")
+    except FileNotFoundError:
+        print("Error: apples_and_oranges.csv not found.")
+        return
+
+    print("Sample Dataset:\n")
+    print(data.head())
+
+    # Split features and target
+    X = data.iloc[:, 0:2].values
+    y = data.iloc[:, 2].values
+
+    # Encode labels (apple/orange → 0/1)
+    le = LabelEncoder()
+    y = le.fit_transform(y)
+
+    # Train-test split
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=1
+    )
+
+    # Train SVM model
+    classifier = SVC(kernel='rbf', random_state=1)
+    classifier.fit(X_train, y_train)
+
+    # Prediction
+    y_pred = classifier.predict(X_test)
+
+    # Confusion matrix & accuracy
+    cm = confusion_matrix(y_test, y_pred)
+    accuracy = cm.diagonal().sum() / len(y_test)
+
+    print("\nConfusion Matrix:\n", cm)
+    print("\nAccuracy Of SVM:", accuracy)
+
+    # -------- Visualization --------
+    plt.figure(figsize=(7, 7))
+
+    X_set, y_set = X_train, y_train
+
+    X1, X2 = np.meshgrid(
+        np.arange(start=X_set[:, 0].min() - 1, stop=X_set[:, 0].max() + 1, step=0.01),
+        np.arange(start=X_set[:, 1].min() - 1, stop=X_set[:, 1].max() + 1, step=0.01)
+    )
+
+    plt.contourf(
+        X1, X2,
+        classifier.predict(np.array([X1.ravel(), X2.ravel()]).T).reshape(X1.shape),
+        alpha=0.75,
+        cmap=ListedColormap(('black', 'white'))
+    )
+
+    plt.xlim(X1.min(), X1.max())
+    plt.ylim(X2.min(), X2.max())
+
+    for i, j in enumerate(np.unique(y_set)):
+        plt.scatter(
+            X_set[y_set == j, 0],
+            X_set[y_set == j, 1],
+            c=ListedColormap(('red', 'orange'))(i),
+            label=le.inverse_transform([j])[0]
+        )
+
+    plt.title("Apples vs Oranges (SVM)")
+    plt.xlabel("Weight in grams")
+    plt.ylabel("Size in cm")
+    plt.legend()
+    plt.show()
+
+
+if __name__ == "__main__":
+    main()
