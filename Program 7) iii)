@@ -1,0 +1,46 @@
+# Title: Gradient Boosting vs Linear Regression on Boston Housing Dataset
+
+# Step 1: Import libraries
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_boston   # Note: deprecated in newer sklearn versions
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.linear_model import LinearRegression
+
+# Step 2: Load dataset
+boston = load_boston()
+print("Feature Names:", boston.feature_names)
+
+# Step 3: Split dataset (using CRIM, NOX, RM as predictors)
+X_train, X_test, y_train, y_test = train_test_split(
+    boston.data[:, [0, 4, 5]],  # CRIM, NOX, RM
+    boston.target,
+    test_size=0.2,
+    random_state=100
+)
+
+# Step 4: Gradient Boosting Regressor
+regressor_gb = GradientBoostingRegressor(
+    n_estimators=100,
+    max_depth=4,
+    learning_rate=0.05,
+    random_state=100
+)
+regressor_gb.fit(X_train, y_train)
+
+print("\nGradient Boosting Feature Importances:", regressor_gb.feature_importances_)
+print("Gradient Boosting R² Score:", regressor_gb.score(X_test, y_test))
+
+# Step 5: Linear Regression
+regressor_lin = LinearRegression()
+regressor_lin.fit(X_train, y_train)
+print("Linear Regression R² Score:", regressor_lin.score(X_test, y_test))
+
+# Step 6: Visualization of Feature Importances
+plt.figure(figsize=(6,4))
+plt.bar(['CRIM', 'NOX', 'RM'], regressor_gb.feature_importances_, color='teal')
+plt.title("Feature Importance - Gradient Boosting Regressor")
+plt.xlabel("Features")
+plt.ylabel("Importance Score")
+plt.show()
